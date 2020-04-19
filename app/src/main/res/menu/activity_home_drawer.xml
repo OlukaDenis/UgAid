@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home"
+            android:title="@string/menu_home" />
+        <item
+            android:id="@+id/nav_countries"
+            android:icon="@drawable/ic_country_location"
+            android:title="@string/countries" />
+        <item
+            android:id="@+id/nav_faq"
+            android:icon="@drawable/ic_local_hospital_black_24dp"
+            android:title="@string/q_and_a" />
+
+        <item
+            android:id="@+id/nav_facts"
+            android:icon="@drawable/ic_facts"
+            android:title="@string/covid19_facts"/>
+
+        <item
+            android:id="@+id/nav_hospital_maps"
+            android:icon="@drawable/ic_map"
+            android:title="@string/locate_hospital"/>
+
+        <item
+            android:id="@+id/nav_donate"
+            android:icon="@drawable/ic_payment"
+            android:title="@string/donate"/>
+
+        <item
+            android:id="@+id/nav_forum"
+            android:icon="@drawable/ic_faqs"
+            android:title="@string/forum"/>
+    </group>
+
+    <item android:title="@string/developer">
+        <menu>
+            <item
+                android:id="@+id/nav_feedback"
+                android:icon="@drawable/ic_feedback_black_24dp"
+                android:title="@string/feedback" />
+        </menu>
+    </item>
+
+</menu>

@@ -1,0 +1,176 @@
+<resources>
+    <string name="app_name">Ug-AID</string>
+    <string name="_000">--</string>
+    <string name="country_corona_status">%1$s Status</string>
+    <string name="recovered">Recovered</string>
+    <string name="deaths">Deaths</string>
+    <string name="confirmed">Confirmed</string>
+    <string name="global_coronavirus_status">Global Coronavirus Status</string>
+    <string name="more_countries">More Countries</string>
+    <string name="more_news">More News</string>
+    <string name="covid19_recent_news">Covid19 Recent News</string>
+    <string name="more">More</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Coronavirus Tracker</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+    <string name="report_bug">Report Bug</string>
+    <string name="developer">Developer</string>
+    <string name="covid19_facts">COVID-19 Facts</string>
+    <string name="countries">Countries Stats</string>
+    <string name="news">COVID-19 News</string>
+    <string name="today"> %1$d  today</string>
+
+    <!--Corona facts-->
+    <string name="what_is_corona"> What is COVID-19? </string>
+    <string name="covid_19_answer"> COVID-19 is the infectious disease caused by the most recently discovered coronavirus. This new virus and disease were unknown before the outbreak began in Wuhan, China, in December 2019.</string>
+    <string name="symptoms">Symptoms</string>
+    <string name="prevention">Prevention</string>
+    <string name="treatment">Treatment</string>
+    <string name="q_and_a">Self Test</string>
+    <string name="symptom_1">People may be sick with the virus for 1 to 14 days before developing symptoms.
+        The most common symptoms of Coronavirus disease (COVID-19) are fever, tiredness, and dry cough.
+        Most people (about 80%) recover from the disease without needing special treatment. More rarely, the
+        disease can be serious and even fatal. Older people, and people with other medical conditions
+        (such as asthma, diabetes, or heart disease), may be more vulnerable to becoming severely ill.</string>
+    <string name="common_symptoms">Common symptoms</string>
+    <string name="running_nose">Running nose</string>
+    <string name="cough">Cough</string>
+    <string name="fever">Fever</string>
+    <string name="tiredness">Tiredness</string>
+    <string name="difficulty_in_breathing">Difficulty in breathing (Severe case)</string>
+    <string name="source_https_www_who_int">Source (https://www.who.int)</string>
+    <string name="no_vaccine">There’s currently no vaccine to prevent coronavirus disease (COVID-19).</string>
+    <string name="prevent_yourself">You can protect yourself and help prevent spreading the virus to others if you:</string>
+    <string name="do_s">Do\'s</string>
+    <string name="prevention_1">Wash your hands regularly for 20 seconds, with soap and water or alcohol-based hand rub</string>
+    <string name="prevention_2">Cover your nose and mouth with a disposable tissue or flexed elbow when you cough or sneeze</string>
+    <string name="prevention_3">Avoid close contact (1 meter or 3 feet) with people who are unwell</string>
+    <string name="prevention_4">Stay home and self-isolate from others in the household if you feel unwell</string>
+    <string name="don_t">Don\'t</string>
+    <string name="prevention_5">Touch your eyes, nose, or mouth if your hands are not clean</string>
+    <string name="no_treatment">There is no specific medicine to prevent or treat coronavirus disease (COVID-19). People may need supportive care to help them breathe.</string>
+    <string name="self_care">Self care</string>
+    <string name="self_care_1">If you have mild symptoms, stay at home until you’ve recovered. You can relieve your symptoms if you:</string>
+    <string name="self_care_2">Rest and sleep</string>
+    <string name="self_care_3">Keep warm</string>
+    <string name="self_care_4">Drink plenty of liquids</string>
+    <string name="self_care_5">Use a room humidifier or take a hot shower to help ease a sore throat and cough</string>
+    <string name="medical_treatments">Medical treatments</string>
+    <string name="medical_1">If you develop a fever, cough, and have difficulty breathing, promptly seek medical care. Call in advance and tell your health provider of any recent travel or recent contact with travelers.</string>
+    <string name="feedback">Feedback</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="corona_treatment">Coronavirus Treatment</string>
+    <string name="corona_symptoms">Coronavirus Symptoms</string>
+    <string name="corona_prevention">Coronavirus Prevention</string>
+    <string name="symptom_info">If you think you have been exposed to COVID-19 and developed a fever and symptoms, submit your symptoms
+        to the nearby hospital or perform a self-test.</string>
+    <string name="submit_symptoms_now">Submit Form</string>
+
+    <!--  Form questions-->
+    <string name="question_1">Do you have trouble with breathing?</string>
+    <string name="question_2">Are you experiencing persistent pain or pressure in the chest?</string>
+    <string name="question_3">Do you have a high temperature? (You feel hot to touch on your chest or back)</string>
+    <string name="question_4">Do you have continuous cough?</string>
+
+    <!-- Form responses    -->
+    <string name="response_1">Yes</string>
+    <string name="response_2">No</string>
+    <string name="response_3">Sometimes</string>
+    <string name="your_name">Your name</string>
+    <string name="name">Name</string>
+    <string name="state_from">Which state do you come from?</string>
+    <string name="what_is_your_gender">What is your gender?</string>
+    <string name="nearest_hospital">Your nearest Government hospital</string>
+    <string name="state">State name</string>
+    <string name="hospital_name">Hospital name</string>
+    <string name="report_symptoms">Report Symptoms</string>
+    <string name="your_telephone_number">Your telephone number</string>
+    <string name="mobile_e_g_234">Mobile e.g. +234…</string>
+    <string name="ncdc_demo">ncdc demo</string>
+    <string name="gender">Gender</string>
+    <string name="title_activity_maps">Map</string>
+
+
+    <!-- Self test questions   -->
+    <string name="test1">Do you have cough?</string>
+    <string name="test2">Do you have cold?</string>
+    <string name="test3">Are you having body aches?</string>
+    <string name="test4">Are you having a sore  throat?</string>
+    <string name="test5">Do you have diarrhea?</string>
+    <string name="test6">Are you having headache?</string>
+    <string name="test7">Do you have fever? (Temperature 37.8 \u2103 and above)</string>
+    <string name="test8">Are you having a difficulty in breathing?</string>
+    <string name="test9"> Are you experiencing fatigue?</string>
+    <string name="test10"> Have you traveled recently in the past 14 days?</string>
+    <string name="test11">Do you have a history of traveling to an area infected with COVID-19?</string>
+    <string name="test12">Do you have direct contact with or are you taking care of positive COVID-19 patient?</string>
+    <string name="results">Results</string>
+    <string name="your_risk_is">Your risk of having COVID-19 is:</string>
+    <string name="probability">probability</string>
+    <string name="action_to_take">Action to take</string>
+
+    <!-- Results   -->
+    <string name="severe">Severe</string>
+    <string name="high">High</string>
+    <string name="medium">Medium</string>
+    <string name="low">Low</string>
+
+    <!-- Actions to take   -->
+    <string name="action_low">You might be having stress. Have enough rest and take a lot of fluids.</string>
+    <string name="action_medium">You might be having early signs. Please start distancing yourself from friends and family.</string>
+    <string name="action_high">Please see a doctor immediately. Do not panic, isolate yourself from friends and family. Visit the nearest hospital for COVID-19 blood test.</string>
+    <string name="action_severe">Do not panic, isolate yourself from friends and family. Call 0800 203 033 immediately</string>
+    <string name="re_test">Re-test</string>
+    <string name="locate_hospital">Locate Testing Centers</string>
+    <string name="request_a_test">Request A test</string>
+    <string name="self_test">Self test</string>
+
+    <!--    Emergency numbers-->
+    <string name="emergency_numbers">07032864444, 08035422711</string>
+    <string name="emergency_numbers_2">08065486416, 08035779917 </string>
+    <string name="report_suspect">Report COVID-19 Suspect</string>
+    <string name="call_phones">Please call these emergency numbers</string>
+
+    <string name="donations">The world has never faced a crisis like COVID-19.
+        It\'s never been more urgent to support the global response. </string>
+    <string name="donate_now">Donate now</string>
+    <string name="fight_covid">Let\'s fight COVID-19 together</string>
+    <string name="amount">Amount to donate</string>
+    <string name="donate">Donate</string>
+    <string name="payment_successful">Payment %1$s!</string>
+    <string name="payment_failed">Payment %1$s!</string>
+    <string name="btn_success">Continue</string>
+    <string name="btn_fail">Try Again</string>
+    <string name="payment_amount"> Amount donated:  $%1$s</string>
+    <string name="or">OR</string>
+    <string name="donate_funds">Donate Funds</string>
+    <string name="donate_materials">Donate Materials</string>
+    <string name="type">Type</string>
+    <string name="quantity">Quantity</string>
+    <string name="contact">Contact</string>
+    <string name="description">Description</string>
+    <string name="forum">Forum</string>
+    <string name="email">Email</string>
+    <string name="what_is_on_your_mind">What is on your mind....</string>
+    <string name="post">Post</string>
+    <string name="name_optional">Name (Optional)</string>
+    <string name="denis_oluka">Denis Oluka</string>
+    <string name="wed_20th_01_2020">Wed 20th 01, 2020</string>
+    <string name="no_internet_connection">No internet connection</string>
+
+    <string name="msg_token_fmt">message_token</string>
+    <string name="district">District</string>
+    <string name="which_district_do_you_come_from">Which district do you come from?</string>
+</resources>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="8dp"
+    tools:context=".view.ui.PreventionActivity">
+
+   <androidx.cardview.widget.CardView
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:padding="8dp"
+           android:orientation="vertical">
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text="@string/no_vaccine"
+               style="@style/textSmallStyle"/>
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text="@string/prevent_yourself"
+               style="@style/textSmallStyle"/>
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text="@string/do_s"
+               android:textColor="@color/colorPrimaryDark"
+               android:textStyle="bold"
+               android:paddingTop="8dp"/>
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_gravity="center"
+               android:padding="4dp"
+               android:orientation="horizontal">
+
+               <View
+                   android:layout_width="8dp"
+                   android:layout_height="8dp"
+                   android:layout_marginTop="6dp"
+                   android:backgroundTint="@color/colorPrimaryDark"
+                   android:background="@drawable/ic_dot"/>
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:paddingStart="8dp"
+                   style="@style/textSmallStyle"
+                   android:text="@string/prevention_1"/>
+
+           </LinearLayout>
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_gravity="center"
+               android:padding="4dp"
+               android:orientation="horizontal">
+
+               <View
+                   android:layout_width="8dp"
+                   android:layout_height="8dp"
+                   android:layout_marginTop="6dp"
+                   android:backgroundTint="@color/colorPrimaryDark"
+                   android:background="@drawable/ic_dot"/>
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:paddingStart="8dp"
+                   style="@style/textSmallStyle"
+                   android:text="@string/prevention_2"/>
+
+           </LinearLayout>
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_gravity="center"
+               android:padding="4dp"
+               android:orientation="horizontal">
+
+               <View
+                   android:layout_width="8dp"
+                   android:layout_height="8dp"
+                   android:layout_marginTop="6dp"
+                   android:backgroundTint="@color/colorPrimaryDark"
+                   android:background="@drawable/ic_dot"/>
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:paddingStart="8dp"
+                   style="@style/textSmallStyle"
+                   android:text="@string/prevention_3"/>
+
+           </LinearLayout>
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_gravity="center"
+               android:padding="4dp"
+               android:orientation="horizontal">
+
+               <View
+                   android:layout_width="8dp"
+                   android:layout_height="8dp"
+                   android:layout_marginTop="6dp"
+                   android:backgroundTint="@color/colorPrimaryDark"
+                   android:background="@drawable/ic_dot"/>
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:paddingStart="8dp"
+                   style="@style/textSmallStyle"
+                   android:text="@string/prevention_4"/>
+
+           </LinearLayout>
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text="@string/don_t"
+               android:textColor="@color/colorPrimaryDark"
+               android:textStyle="bold"
+               android:paddingTop="8dp"/>
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_gravity="center"
+               android:padding="4dp"
+               android:orientation="horizontal">
+
+               <View
+                   android:layout_width="8dp"
+                   android:layout_height="8dp"
+                   android:layout_marginTop="6dp"
+                   android:backgroundTint="@color/colorPrimaryDark"
+                   android:background="@drawable/ic_dot"/>
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:paddingStart="8dp"
+                   style="@style/textSmallStyle"
+                   android:text="@string/prevention_5"/>
+
+           </LinearLayout>
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text="@string/source_https_www_who_int"
+               android:textStyle="italic"
+               android:textSize="12sp"
+               android:paddingTop="16dp"/>
+
+       </LinearLayout>
+   </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

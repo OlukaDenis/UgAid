@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.app.ugaid.view.ui.home.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_countries"
+        android:name="com.app.ugaid.view.ui.countries.CountriesFragment"
+        android:label="Country Stats"
+        tools:layout="@layout/fragment_countries" />
+
+    <fragment
+        android:id="@+id/nav_feedback"
+        android:name="com.app.ugaid.view.ui.FeedbackFragment"
+        android:label="Feedback"
+        tools:layout="@layout/fragment_feedback" />
+
+    <fragment
+        android:id="@+id/nav_faq"
+        android:name="com.app.ugaid.view.ui.self_test.SelfTestFragment"
+        android:label="Self Test"
+        tools:layout="@layout/fragment_faq" />
+
+    <fragment
+        android:id="@+id/nav_facts"
+        android:name="com.app.ugaid.view.ui.facts.FactsFragment"
+        android:label="Covid 19 Facts"
+        tools:layout="@layout/fragment_facts" />
+
+    <fragment
+        android:id="@+id/nav_hospital_maps"
+        android:name="com.app.ugaid.view.ui.maps.MapsFragment"
+        android:label="Testing Centers"
+        tools:layout="@layout/fragment_maps" />
+
+    <fragment
+        android:id="@+id/nav_donate"
+        android:name="com.app.ugaid.view.ui.donate.DonationFragment"
+        android:label="Donate"
+        tools:layout="@layout/fragment_donation" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_material_donate"
+        android:name="com.app.ugaid.view.ui.donate.MaterialDonationFragment"
+        android:label="Material Donation"
+        tools:layout="@layout/fragment_material_donation" />
+
+    <fragment
+        android:id="@+id/nav_funds_donate"
+        android:name="com.app.ugaid.view.ui.donate.FundsDonationFragment"
+        android:label="Donate Funds"
+        tools:layout="@layout/fragment_funds_donation" />
+
+    <fragment
+        android:id="@+id/nav_forum"
+        android:name="com.app.ugaid.view.ui.forum.ForumFragment"
+        android:label="Forum"
+        tools:layout="@layout/fragment_forum" />
+
+    <fragment
+        android:id="@+id/nav_add_post"
+        android:name="com.app.ugaid.view.ui.forum.AddPostFragment"
+        android:label="Add New Post"
+        tools:layout="@layout/fragment_add_post" />
+
+</navigation>
