@@ -10,6 +10,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -19,7 +20,9 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class Config {
@@ -56,14 +59,23 @@ public class Config {
     //Default markers
     public static final LatLng MULAGO_HOSPITAL = new LatLng(0.338067, 32.576133);
 
-    public static final LatLng ENTEBBE_HOSPITAL = new LatLng(0.064015, 32.471713);
+    public static final LatLng ENTEBBE_HOSPITAL = new LatLng(0.059125, 32.471051);
 
-    private static final int LOCATION_PERMISSION_ID = 1;
+    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
+    public static final int PERMISSION_ID = 2;
+
+    public static final String EMERGENCY_NUMBER = "0800100066";
 
     //FCM
     public static final String FCM_NOTIFICATION_ID = "222";
     public static final int NOTIFICATION_ID = 101;
     public static final String FCM_NOTIFICATION_CHANNEL = "cloud_messages_channel";
+
+    public static final String[] PERMISSIONS = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.CALL_PHONE
+    };
 
 
     //Util methods
@@ -88,23 +100,31 @@ public class Config {
     }
 
     //Check whether the user allowed the location
-    public static  boolean checkLocationPermissions(Context context){
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            return true;
+//    public static  boolean checkLocationPermission(Context context){
+//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+//                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+//            return true;
+//        }
+//        return false;
+//    }
+
+//    public static boolean checkCallPermission(Context context){
+//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+//            return true;
+//        }
+//        return false;
+//    }
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
         }
-        return false;
+        return true;
     }
-
-    //If location is not allowed, request location
-    public static void requestLocationPermissions(Activity activity){
-        ActivityCompat.requestPermissions(
-                activity,
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                LOCATION_PERMISSION_ID
-        );
-    }
-
 
     //Check for available network
     public static boolean isNetworkAvailable(Context context) {

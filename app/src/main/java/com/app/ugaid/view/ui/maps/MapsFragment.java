@@ -10,6 +10,7 @@ import android.os.Bundle;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
@@ -35,6 +36,8 @@ import com.app.ugaid.view.ui.symptom_form.SymptomFormActivity;
 
 import static com.app.ugaid.utils.Config.MULAGO_HOSPITAL;
 import static com.app.ugaid.utils.Config.ENTEBBE_HOSPITAL;
+import static com.app.ugaid.utils.Config.PERMISSIONS;
+import static com.app.ugaid.utils.Config.PERMISSION_ID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -104,7 +107,7 @@ public class MapsFragment extends Fragment implements
 
         entebbe = mMap.addMarker(new MarkerOptions()
                 .position(ENTEBBE_HOSPITAL)
-                .title("Entebbe General Referral Hospital")
+                .title("Entebbe Grade B Hospital")
                 .snippet("Testing Center 1")
                 .visible(true)
                 .zIndex(4));
@@ -176,10 +179,10 @@ public class MapsFragment extends Fragment implements
      * Otherwise, enables the location layer.
      */
     private void enableMyLocation(GoogleMap map) {
-        if (Config.checkLocationPermissions(getContext())){
+        if (Config.hasPermissions(getActivity(), PERMISSIONS)){
             map.setMyLocationEnabled(true);
         } else {
-            Config.requestLocationPermissions(getActivity());
+            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ID);
         }
     }
 }

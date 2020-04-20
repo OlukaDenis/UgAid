@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
 
     <application
         android:allowBackup="true"
@@ -55,7 +56,7 @@
         </activity>
         <activity
             android:name=".view.ui.symptom_form.SymptomFormActivity"
-            android:label="Symptom Report Form">
+            android:label="Test Request Form">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.app.ugaid.view.ui.HomeActivity" />
