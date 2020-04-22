@@ -1,11 +1,15 @@
 package com.app.ugaid.view.ui.home;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +24,10 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.work.Constraints;
 import androidx.work.Data;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
@@ -42,12 +49,16 @@ import com.app.ugaid.view.ui.hospitals.HospitalViewModelFactory;
 import com.app.ugaid.view.ui.symptom_form.SymptomFormActivity;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.app.ugaid.utils.Config.COUNTRY_STATS_WORKER;
+import static com.app.ugaid.utils.Config.DEVICE_LOCATIONS_WORKER;
 import static com.app.ugaid.utils.Config.EMERGENCY_NUMBER;
 import static com.app.ugaid.utils.Config.PERMISSIONS;
 import static com.app.ugaid.utils.Config.PERMISSION_ID;
@@ -56,7 +67,6 @@ import static com.app.ugaid.utils.Config.UPDATED;
 import static com.app.ugaid.utils.Config.formatNumber;
 
 public class HomeFragment extends Fragment {
-    private WorkManager covidWorkManager;
     private WorkManager locationWorker;
 
     private TextView tvCases, tvDeaths, tvRecovered, ugCases, ugDeaths, ugRecovered, ugCasesToday, ugDeathsToday, moreCountries, moreFacts;
@@ -71,6 +81,9 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+
+        //check for permissions
+        checkForPermissions();
 
         //Init firebase analytics
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
@@ -108,30 +121,17 @@ public class HomeFragment extends Fragment {
 
 
         if (Config.isNetworkAvailable(getActivity())){
+            getGlobalStats();
             getCountryCoronaStats();
-            populateStats();
         }
 
-        // initializing a work manager
-        covidWorkManager = WorkManager.getInstance(getActivity());
-        locationWorker = WorkManager.getInstance(getActivity());
-
-        Data source = new Data.Builder()
-                .putString("workType", "PeriodicTime")
+        // initializing a countries work manager
+        WorkManager countriesWorker = WorkManager.getInstance(getActivity());
+        PeriodicWorkRequest countryStatsRequest = new PeriodicWorkRequest.Builder(CovidWorker.class, 15, TimeUnit.MINUTES)
                 .build();
-
-        //periodic work request
-        PeriodicWorkRequest periodicRequest = new PeriodicWorkRequest.Builder(CovidWorker.class, 15, TimeUnit.MINUTES)
-                .setInputData(source)
-                .build();
-        covidWorkManager.enqueue(periodicRequest);
-
-        //work info
-        covidWorkManager.getWorkInfoByIdLiveData(periodicRequest.getId()).observe(getActivity(), workInfo -> {
-            if (workInfo != null) {
-                WorkInfo.State state = workInfo.getState();
-            }
-        });
+        countriesWorker.enqueueUniquePeriodicWork(COUNTRY_STATS_WORKER,
+                ExistingPeriodicWorkPolicy.KEEP,
+                countryStatsRequest);
 
 
         return root;
@@ -182,14 +182,6 @@ public class HomeFragment extends Fragment {
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
     }
 
-
-    private void populateStats() {
-        Covid covid = viewModel.getGlobalStats(UPDATED);
-        tvCases.setText(formatNumber(covid.getCases()));
-        tvDeaths.setText(formatNumber(covid.getDeaths()));
-        tvRecovered.setText(formatNumber(covid.getRecovered()));
-    }
-
     private void getCountryCoronaStats(){
         ApiService service = ApiClient.getApiService(ApiService.class);
         Call<CoronaCountry> call = service.getOneCountry(UGANDA);
@@ -231,5 +223,52 @@ public class HomeFragment extends Fragment {
         ugDeathsToday.setText(String.format(res.getString(R.string.today), country.getTodayDeaths()));
     }
 
+    private void getGlobalStats(){
+        ApiService service = ApiClient.getApiService(ApiService.class);
+        Call<Covid> call = service.getWorldStats();
+        call.enqueue(new Callback<Covid>() {
+            @Override
+            public void onResponse(Call<Covid> call, Response<Covid> response) {
+                if (response.isSuccessful()){
+                    Covid covid = response.body();
+                    if (covid != null) {
+                       populateStats(covid);
+                    }
+                }
+            }
 
+            @Override
+            public void onFailure(Call<Covid> call, Throwable t) {
+                Log.e(TAG, "onFailure: ",t );
+            }
+        });
+
+    }
+
+    private void populateStats(Covid covid) {
+        tvCases.setText(formatNumber(covid.getCases()));
+        tvDeaths.setText(formatNumber(covid.getDeaths()));
+        tvRecovered.setText(formatNumber(covid.getRecovered()));
+    }
+
+    private void checkForPermissions() {
+        if (!Config.hasPermissions(getActivity(), PERMISSIONS)) {
+            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ID);
+        } else {
+            startLocationWorker();
+        }
+    }
+
+    private void startLocationWorker() {
+        //Sending device locations worker
+        WorkManager locationsWorkManager = WorkManager.getInstance(getActivity());
+        Constraints locationConstraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
+        PeriodicWorkRequest locationRequest = new PeriodicWorkRequest.Builder(LocationWorker.class,
+                5,
+                TimeUnit.MINUTES)
+                .build();
+        locationsWorkManager.enqueueUniquePeriodicWork(DEVICE_LOCATIONS_WORKER,
+                ExistingPeriodicWorkPolicy.KEEP,
+                locationRequest);
+    }
 }

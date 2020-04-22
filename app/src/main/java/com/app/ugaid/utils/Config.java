@@ -42,6 +42,11 @@ public class Config {
 
     public static final int HOSPITAL_RESULT_OK = 201;
 
+    //worker tags
+    public static final String COUNTRY_STATS_WORKER = "Country_stats_worker";
+    public static final String DEVICE_LOCATIONS_WORKER ="Device_location_worker";
+    public static final String GLOBAL_STATS_WORKER = "Global_stats_worker";
+
     //Covid 19 probability
     public static final int COUGH = 90;
     public static final int COLD = 60;
@@ -99,21 +104,6 @@ public class Config {
         return key.replaceAll("[-+.^:,]","");
     }
 
-    //Check whether the user allowed the location
-//    public static  boolean checkLocationPermission(Context context){
-//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-//                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-//            return true;
-//        }
-//        return false;
-//    }
-
-//    public static boolean checkCallPermission(Context context){
-//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-//            return true;
-//        }
-//        return false;
-//    }
 
     public static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {

@@ -10,6 +10,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.app.ugaid.data.workers.LocationWorker;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -20,11 +21,19 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.concurrent.TimeUnit;
+
+import static com.app.ugaid.utils.Config.DEVICE_LOCATIONS_WORKER;
 import static com.app.ugaid.utils.Config.PERMISSIONS;
 import static com.app.ugaid.utils.Config.PERMISSION_ID;
 
@@ -40,8 +49,6 @@ public class HomeActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //Check for permissions
-        checkForPermissions();
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -63,12 +70,6 @@ public class HomeActivity extends AppCompatActivity {
         //Init firebase analytics
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-    }
-
-    private void checkForPermissions() {
-        if (!Config.hasPermissions(this, PERMISSIONS)) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ID);
-        }
     }
 
     @Override

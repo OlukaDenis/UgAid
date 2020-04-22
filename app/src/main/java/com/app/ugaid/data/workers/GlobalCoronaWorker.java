@@ -27,6 +27,7 @@ public class GlobalCoronaWorker extends Worker {
         super(context, workerParams);
         database = CovidDatabase.getDatabase(context);
         globalDao = database.globalDao();
+        Log.d(TAG, "GlobalCoronaWorker called: ");
     }
 
     @NonNull
@@ -48,7 +49,7 @@ public class GlobalCoronaWorker extends Worker {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG, "Error fetching data", e);
+            Log.e(TAG, "Error fetching global data", e);
             return Result.failure();
         }
 

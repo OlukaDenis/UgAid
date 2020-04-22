@@ -27,4 +27,9 @@ public class DeviceLocation {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
+
+    public String info(){
+        return "Latitude: "+getLatitude()+ "\n" +
+                "Longitude: "+getLongitude()+ "\n";
+    }
 }

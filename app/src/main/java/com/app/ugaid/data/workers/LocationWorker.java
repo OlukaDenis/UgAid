@@ -64,6 +64,7 @@ public class LocationWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        Log.d(TAG, "Sending location data to firebase: ");
         Context context = getApplicationContext();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
 
@@ -77,7 +78,7 @@ public class LocationWorker extends Worker {
             //unique id
             String unique = idSharedPref.getString(context.getString(R.string.unique_device_id), "");
             getLastLocation(context, unique, timestamp);
-            Log.d(TAG, "doWork: "+unique);
+            Log.d(TAG, "Unique Device ID: "+unique);
             return Result.success();
 
         } catch (Exception e) {
@@ -90,6 +91,7 @@ public class LocationWorker extends Worker {
 
     @SuppressLint("MissingPermission")
     private void getLastLocation(Context context, String unique, String timestamp){
+        Log.d(TAG, "Preparing the the exact device location...... ");
         if (Config.hasPermissions(context, PERMISSIONS)) {
             if (isLocationEnabled(context)) {
                 mFusedLocationClient.getLastLocation().addOnCompleteListener(
@@ -99,6 +101,7 @@ public class LocationWorker extends Worker {
                                 DatabaseReference locationRef = database.getReference().child("device-locations");
                                 DeviceLocation deviceLocation = new DeviceLocation(location.getLatitude(), location.getLongitude());
                                 locationRef.child(unique).child(timestamp).setValue(deviceLocation);
+                                Log.d(TAG, "LastLocation saved: "+deviceLocation.info());
                             }
                         }
                 );

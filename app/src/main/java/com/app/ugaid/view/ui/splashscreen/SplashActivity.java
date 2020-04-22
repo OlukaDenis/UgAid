@@ -2,6 +2,7 @@ package com.app.ugaid.view.ui.splashscreen;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
@@ -22,8 +23,10 @@ import com.app.ugaid.view.ui.HomeActivity;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import static com.app.ugaid.utils.Config.DEVICE_LOCATIONS_WORKER;
+import static com.app.ugaid.utils.Config.GLOBAL_STATS_WORKER;
+
 public class SplashActivity extends AppCompatActivity {
-    private WorkManager workManager;
     private AlertDialog.Builder builder;
     private static final String TAG = "SplashActivity";
 
@@ -34,18 +37,14 @@ public class SplashActivity extends AppCompatActivity {
         builder = new AlertDialog.Builder(this);
         generateUniqueID();
 
-        workManager = WorkManager.getInstance(this);
-
         if (Config.isNetworkAvailable(this)) {
             //global stats periodic work request
+            WorkManager globalStatsWorkManger = WorkManager.getInstance(this);
             PeriodicWorkRequest globalStatsRequest = new PeriodicWorkRequest.Builder(GlobalCoronaWorker.class, 15, TimeUnit.MINUTES)
                     .build();
-            workManager.enqueue(globalStatsRequest);
-
-            //Sending device locations
-            PeriodicWorkRequest locationRequest = new PeriodicWorkRequest.Builder(LocationWorker.class, 59, TimeUnit.MINUTES)
-                    .build();
-            workManager.enqueue(locationRequest);
+            globalStatsWorkManger.enqueueUniquePeriodicWork(GLOBAL_STATS_WORKER,
+                    ExistingPeriodicWorkPolicy.KEEP,
+                    globalStatsRequest);
 
             new Handler().postDelayed(() -> {
                 // This method will be executed once the timer is over
