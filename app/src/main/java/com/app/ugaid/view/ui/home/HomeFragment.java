@@ -1,9 +1,13 @@
 package com.app.ugaid.view.ui.home;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -17,8 +21,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -33,6 +39,8 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
+import com.app.ugaid.data.receivers.BluetoothReceiver;
+import com.app.ugaid.data.workers.BluetoothWorker;
 import com.app.ugaid.data.workers.LocationWorker;
 import com.app.ugaid.utils.Config;
 import com.google.android.material.button.MaterialButton;
@@ -51,17 +59,20 @@ import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.app.Activity.RESULT_OK;
 import static com.app.ugaid.utils.Config.COUNTRY_STATS_WORKER;
 import static com.app.ugaid.utils.Config.DEVICE_LOCATIONS_WORKER;
 import static com.app.ugaid.utils.Config.EMERGENCY_NUMBER;
 import static com.app.ugaid.utils.Config.PERMISSIONS;
 import static com.app.ugaid.utils.Config.PERMISSION_ID;
+import static com.app.ugaid.utils.Config.REQUEST_ENABLE_BLUETOOTH;
 import static com.app.ugaid.utils.Config.UGANDA;
 import static com.app.ugaid.utils.Config.UPDATED;
 import static com.app.ugaid.utils.Config.formatNumber;
@@ -77,10 +88,16 @@ public class HomeFragment extends Fragment {
     private HomeViewModel viewModel;
     private static final String TAG = "HomeFragment";
     private FirebaseAnalytics mFirebaseAnalytics;
+    private BluetoothAdapter bluetoothAdapter;
+    private BluetoothReceiver receiver;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+
+
+        //Enable bluetooth
+        checkForBluetooth();
 
         //check for permissions
         checkForPermissions();
@@ -133,6 +150,14 @@ public class HomeFragment extends Fragment {
                 ExistingPeriodicWorkPolicy.KEEP,
                 countryStatsRequest);
 
+        //Discover bluetooth devices with worker
+        WorkManager discoverWorker = WorkManager.getInstance(getActivity());
+        PeriodicWorkRequest getDevicesRequest = new PeriodicWorkRequest.Builder(
+                BluetoothWorker.class,
+                5,
+                TimeUnit.MINUTES
+        ).build();
+        discoverWorker.enqueue(getDevicesRequest);
 
         return root;
 
@@ -262,13 +287,49 @@ public class HomeFragment extends Fragment {
     private void startLocationWorker() {
         //Sending device locations worker
         WorkManager locationsWorkManager = WorkManager.getInstance(getActivity());
-        Constraints locationConstraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
         PeriodicWorkRequest locationRequest = new PeriodicWorkRequest.Builder(LocationWorker.class,
-                5,
+                60,
                 TimeUnit.MINUTES)
                 .build();
         locationsWorkManager.enqueueUniquePeriodicWork(DEVICE_LOCATIONS_WORKER,
                 ExistingPeriodicWorkPolicy.KEEP,
                 locationRequest);
     }
+
+    private void checkForBluetooth(){
+        Log.d(TAG, "checkForBluetooth called..... ");
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            // Device doesn't support Bluetooth
+            Toast.makeText(getActivity(), "Your device doesn't support bluetooth.", Toast.LENGTH_SHORT).show();
+        } else {
+
+            if (!bluetoothAdapter.isEnabled()) {
+                Log.d(TAG, "Enabling the bluetooth.......");
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_ENABLE_BLUETOOTH && resultCode == RESULT_OK) {
+            Toast.makeText(getActivity(), "Bluetooth enabled", Toast.LENGTH_SHORT).show();
+            makeBluetoothDiscoverable();
+
+        }
+    }
+
+    private void makeBluetoothDiscoverable() {
+        Log.d(TAG, "makeBluetoothDiscoverable called ..... ");
+        Intent discoverableIntent =
+                new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
+        startActivity(discoverableIntent);
+        Toast.makeText(getActivity(), "Your device is now discoverable to nearby Bluetooth devices", Toast.LENGTH_SHORT).show();
+    }
+
 }
