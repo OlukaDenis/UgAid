@@ -32,7 +32,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.app.ugaid.R;
 import com.app.ugaid.utils.Config;
-import com.app.ugaid.view.ui.symptom_form.SymptomFormActivity;
+import com.app.ugaid.view.ui.test_request.TestRequestFragment;
 
 import static com.app.ugaid.utils.Config.MULAGO_HOSPITAL;
 import static com.app.ugaid.utils.Config.ENTEBBE_HOSPITAL;
@@ -68,7 +68,7 @@ public class MapsFragment extends Fragment implements
 
         CardView btnSymptom = root.findViewById(R.id.request_test);
         btnSymptom.setOnClickListener(v -> {
-            startActivity(new Intent(getActivity(), SymptomFormActivity.class));
+            startActivity(new Intent(getActivity(), TestRequestFragment.class));
 
             Bundle bundle = new Bundle();
             bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Open Symptom Form");

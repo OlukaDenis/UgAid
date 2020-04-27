@@ -70,23 +70,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.ui.symptom_form.SymptomFormActivity"
+            android:name=".view.ui.test_request.TestRequestFragment"
             android:label="Test Request Form">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.app.ugaid.view.ui.HomeActivity" />
         </activity>
-        <activity android:name=".view.ui.TreatmentActivity">
+        <activity android:name=".view.ui.facts.TreatmentFragment">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.app.ugaid.view.ui.HomeActivity" />
         </activity>
-        <activity android:name=".view.ui.PreventionActivity">
+        <activity android:name=".view.ui.facts.PreventionFragment">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.app.ugaid.view.ui.HomeActivity" />
         </activity>
-        <activity android:name=".view.ui.SymptomsActivity">
+        <activity android:name=".view.ui.facts.SymptomsFragment">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.app.ugaid.view.ui.HomeActivity" />

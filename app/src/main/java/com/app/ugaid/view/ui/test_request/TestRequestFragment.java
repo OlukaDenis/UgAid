@@ -1,9 +1,12 @@
-package com.app.ugaid.view.ui.symptom_form;
+package com.app.ugaid.view.ui.test_request;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -13,6 +16,9 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -34,7 +40,6 @@ import com.app.ugaid.model.Form;
 import com.app.ugaid.model.Symptom;
 import com.app.ugaid.model.User;
 import com.app.ugaid.utils.Config;
-import com.app.ugaid.view.ui.HomeActivity;
 import com.app.ugaid.view.ui.hospitals.HospitalViewModel;
 import com.app.ugaid.view.ui.hospitals.HospitalViewModelFactory;
 
@@ -43,9 +48,10 @@ import java.util.Objects;
 import static com.app.ugaid.utils.Config.PERMISSIONS;
 import static com.app.ugaid.utils.Config.PERMISSION_ID;
 
-public class SymptomFormActivity extends AppCompatActivity {
+public class TestRequestFragment extends Fragment {
+
     private  String[] GENDER = new String[] {"Male", "Female", "Prefer not to say"};
-    private static final String TAG = "SymptomFormActivity";
+    private static final String TAG = "TestRequestFragment";
 
     private TextInputEditText userName, userPhone;
     private TextInputLayout hospitalLayout;
@@ -60,86 +66,84 @@ public class SymptomFormActivity extends AppCompatActivity {
     private String breathAnswer, tempAnswer, coughAnswer, chestAnswer;
     private String name, state, hospital, phone;
 
-    private  SymptomFormViewModel viewModel;
+    private TestRequestViewModel viewModel;
     private static final int HOSPITAL_REQUEST_CODE = 100;
 
     private FirebaseAnalytics mFirebaseAnalytics;
     private FusedLocationProviderClient mFusedLocationClient;
     private double mLat, mLong;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_symptom_form);
 
-        builder = new AlertDialog.Builder(this);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_test_request, container, false);
+
+        builder = new AlertDialog.Builder(getContext());
         //Init firebase analytics
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
+        mFirebaseAnalytics.setCurrentScreen(getActivity(), this.getClass().getSimpleName(),
+                this.getClass().getSimpleName());
 
-        SymptomFormViewModelFactory factory = new SymptomFormViewModelFactory(this.getApplication());
-        viewModel = new ViewModelProvider(this, factory).get(SymptomFormViewModel.class);
+        TestRequestViewModelFactory factory = new TestRequestViewModelFactory(getActivity().getApplication());
+        viewModel = new ViewModelProvider(this, factory).get(TestRequestViewModel.class);
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         getLastLocation();
 
 
-        ArrayAdapter adapter = new ArrayAdapter<>(this, R.layout.dropdown_pop_up_item, GENDER);
+        ArrayAdapter adapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_pop_up_item, GENDER);
 
-        userGender = findViewById(R.id.gender_exposed_dropdown);
+        userGender = root.findViewById(R.id.gender_exposed_dropdown);
         userGender.setKeyListener(null);
         userGender.setAdapter(adapter);
 
-        userName = findViewById(R.id.user_name);
-        userPhone = findViewById(R.id.phone_number);
-        hospitalLayout = findViewById(R.id.hospital_name_layout);
+        userName = root.findViewById(R.id.user_name);
+        userPhone = root.findViewById(R.id.phone_number);
+        hospitalLayout = root.findViewById(R.id.hospital_name_layout);
 
 
-        rgBreathing = findViewById(R.id.rg_breathing);
-        rgChestPain = findViewById(R.id.rg_chest);
-        rgCough = findViewById(R.id.rg_cough);
-        rgTemperature = findViewById(R.id.rg_temperature);
+        rgBreathing = root.findViewById(R.id.rg_breathing);
+        rgChestPain = root.findViewById(R.id.rg_chest);
+        rgCough = root.findViewById(R.id.rg_cough);
+        rgTemperature = root.findViewById(R.id.rg_temperature);
 
-        btnSubmitForm = findViewById(R.id.btn_submit_form);
+        btnSubmitForm = root.findViewById(R.id.btn_submit_form);
 
         //Autocomplete textview for states
-        userState = findViewById(R.id.state_name);
+        userState = root.findViewById(R.id.state_name);
         userState.setKeyListener(null);
-        ArrayAdapter sAdapter = new ArrayAdapter<>(this, R.layout.dropdown_pop_up_item, LocalDataSource.districts());
+        ArrayAdapter sAdapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_pop_up_item, LocalDataSource.districts());
         userState.setAdapter(sAdapter);
 
         //Autocomplete textview for hospitals
-        formHospital = findViewById(R.id.hospital_name);
+        formHospital = root.findViewById(R.id.hospital_name);
         formHospital.setKeyListener(null);
-        HospitalViewModelFactory mfactory = new HospitalViewModelFactory(this.getApplication());
+        HospitalViewModelFactory mfactory = new HospitalViewModelFactory(getActivity().getApplication());
         HospitalViewModel viewModel = new ViewModelProvider(this, mfactory).get(HospitalViewModel.class);
-        viewModel.getAllHospitals().observe(this, hospitals -> {
+        viewModel.getAllHospitals().observe(getViewLifecycleOwner(), hospitals -> {
 
-            ArrayAdapter mAdapter = new ArrayAdapter<>(this, R.layout.dropdown_pop_up_item, LocalDataSource.testingCenters());
+            ArrayAdapter mAdapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_pop_up_item, LocalDataSource.testingCenters());
             formHospital.setAdapter(mAdapter);
         });
 
-        formHospital.setOnClickListener(v -> {
-//            Intent getHospitalIntent = new Intent(this, HospitalActivity.class);
-//            startActivityForResult(getHospitalIntent, HOSPITAL_REQUEST_CODE);
-        });
 
         rgBreathing.setOnCheckedChangeListener((group, checkedId) -> {
-            answerOne = findViewById(checkedId);
+            answerOne = root.findViewById(checkedId);
             breathAnswer = answerOne.getText().toString();
         });
 
         rgChestPain.setOnCheckedChangeListener((group, checkedId) -> {
-            answerTwo = findViewById(checkedId);
+            answerTwo = root.findViewById(checkedId);
             chestAnswer = answerTwo.getText().toString();
         });
 
         rgTemperature.setOnCheckedChangeListener((group, checkedId) -> {
-            answerThree = findViewById(checkedId);
+            answerThree = root.findViewById(checkedId);
             tempAnswer = answerThree.getText().toString();
         });
 
         rgCough.setOnCheckedChangeListener((group, checkedId) -> {
-            answerFour = findViewById(checkedId);
+            answerFour = root.findViewById(checkedId);
             coughAnswer = answerFour.getText().toString();
         });
 
@@ -147,6 +151,8 @@ public class SymptomFormActivity extends AppCompatActivity {
         btnSubmitForm.setOnClickListener(v ->{
             sumbitForm();
         });
+
+        return root;
     }
 
     private void sumbitForm() {
@@ -165,7 +171,7 @@ public class SymptomFormActivity extends AppCompatActivity {
 
         if (rgBreathing.getCheckedRadioButtonId() == -1 || rgCough.getCheckedRadioButtonId() == -1 ||
             rgTemperature.getCheckedRadioButtonId() == -1 || rgChestPain.getCheckedRadioButtonId() == -1){
-            Toast.makeText(this, "Please choose YES, NO or SOMETIMES", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Please choose YES, NO or SOMETIMES", Toast.LENGTH_SHORT).show();
         } else if(name.isEmpty()){
             userName.setError("Please provide your name");
         }
@@ -174,7 +180,7 @@ public class SymptomFormActivity extends AppCompatActivity {
         }else if(phone.isEmpty()){
             userPhone.setError("Please provide your phone number");
         }else if(gender.isEmpty()){
-            Toast.makeText(this, "Please you must provide your gender", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Please you must provide your gender", Toast.LENGTH_SHORT).show();
         }else {
             //Form submission
             Form form = new Form(user, symptom, hospital, mLat, mLong);
@@ -183,8 +189,8 @@ public class SymptomFormActivity extends AppCompatActivity {
             builder.setTitle("Thank you for submitting your symptoms")
                     .setMessage("Our health staff will contact you soon")
                     .setPositiveButton("Okay", (dialog, which) -> {
-                        startActivity(new Intent(this, HomeActivity.class));
-                        finish();
+                        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+                        navController.navigate(R.id.nav_home);
                     });
             builder.setCancelable(false);
             builder.show();
@@ -194,7 +200,7 @@ public class SymptomFormActivity extends AppCompatActivity {
 
     @SuppressLint("MissingPermission")
     private void getLastLocation(){
-        if (Config.hasPermissions(this, PERMISSIONS)) {
+        if (Config.hasPermissions(getActivity(), PERMISSIONS)) {
             if (isLocationEnabled()) {
                 mFusedLocationClient.getLastLocation().addOnCompleteListener(
                         task -> {
@@ -208,12 +214,12 @@ public class SymptomFormActivity extends AppCompatActivity {
                         }
                 );
             } else {
-                Toast.makeText(this, "Turn on the device location", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Turn on the device location", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
             }
         } else {
-            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ID);
+            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ID);
         }
     }
 
@@ -226,7 +232,7 @@ public class SymptomFormActivity extends AppCompatActivity {
         mLocationRequest.setFastestInterval(0);
         mLocationRequest.setNumUpdates(1);
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         mFusedLocationClient.requestLocationUpdates(
                 mLocationRequest, mLocationCallback,
                 Looper.myLooper()
@@ -244,7 +250,7 @@ public class SymptomFormActivity extends AppCompatActivity {
     };
 
     private boolean isLocationEnabled(){
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
                 LocationManager.NETWORK_PROVIDER
         );
@@ -253,7 +259,7 @@ public class SymptomFormActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        if (Config.hasPermissions(this, PERMISSIONS)) {
+        if (Config.hasPermissions(getActivity(), PERMISSIONS)) {
             getLastLocation();
         }
     }

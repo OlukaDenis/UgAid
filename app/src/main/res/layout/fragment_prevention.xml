@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="8dp"
-    tools:context=".view.ui.PreventionActivity">
+    tools:context=".view.ui.facts.PreventionFragment">
 
    <androidx.cardview.widget.CardView
        android:layout_width="match_parent"

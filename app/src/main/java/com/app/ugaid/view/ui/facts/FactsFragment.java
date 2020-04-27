@@ -16,9 +16,6 @@ import androidx.navigation.Navigation;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.app.ugaid.R;
-import com.app.ugaid.view.ui.PreventionActivity;
-import com.app.ugaid.view.ui.SymptomsActivity;
-import com.app.ugaid.view.ui.TreatmentActivity;
 import com.app.ugaid.view.ui.self_test.SelfTestFragment;
 
 import java.util.Objects;
@@ -29,7 +26,9 @@ public class FactsFragment extends Fragment {
     private SelfTestFragment selfTestFragment;
     private FragmentManager fragmentManager;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private NavController navController;
 
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         factsViewModel =
@@ -46,19 +45,40 @@ public class FactsFragment extends Fragment {
         preventionCard = root.findViewById(R.id.prevention_card);
 
         faqCard.setOnClickListener(v -> openTestFragment() );
-        symptomCard.setOnClickListener(v -> startActivity(new Intent(getActivity(), SymptomsActivity.class)));
-        treatmentCard.setOnClickListener(v -> startActivity(new Intent(getActivity(), TreatmentActivity.class)));
-        preventionCard.setOnClickListener(v -> startActivity(new Intent(getActivity(), PreventionActivity.class)));
+        symptomCard.setOnClickListener(v -> openSymptomFragment());
+        treatmentCard.setOnClickListener(v -> openTreatmentFragment());
+        preventionCard.setOnClickListener(v -> openPreventionFragment());
+
+        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
 
         return root;
     }
 
     private void openTestFragment() {
-        NavController navController = Navigation.findNavController(Objects.requireNonNull(getActivity()), R.id.nav_host_fragment);
         navController.navigate(R.id.nav_faq);
-
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Open Self-Test");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
+    }
+
+    private void openSymptomFragment() {
+        navController.navigate(R.id.nav_symptoms);
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Open symptoms");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
+    }
+
+    private void openTreatmentFragment() {
+        navController.navigate(R.id.nav_treatment);
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Open treatment");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
+    }
+
+    private void openPreventionFragment() {
+        navController.navigate(R.id.nav_prevention);
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Open prevention");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
     }
 }

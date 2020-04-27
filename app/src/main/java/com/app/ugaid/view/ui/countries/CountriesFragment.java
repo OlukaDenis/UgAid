@@ -49,7 +49,7 @@ public class CountriesFragment extends Fragment {
 
         recyclerView = root.findViewById(R.id.country_recyclerview);
 
-        countriesViewModel.getStatsByCountry().observe(this, coronaCountries -> {
+        countriesViewModel.getStatsByCountry().observe(getViewLifecycleOwner(), coronaCountries -> {
             countryList = coronaCountries;
             showRecycleview();
         });

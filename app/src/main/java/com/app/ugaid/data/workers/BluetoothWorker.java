@@ -12,6 +12,8 @@ import androidx.work.WorkerParameters;
 
 import com.app.ugaid.data.receivers.BluetoothReceiver;
 
+import java.util.concurrent.Executor;
+
 public class BluetoothWorker extends Worker {
     private static final String TAG = "BluetoothWorker";
     private BluetoothReceiver receiver;
@@ -35,10 +37,11 @@ public class BluetoothWorker extends Worker {
             // Register for broadcasts when a device is discovered.
             IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
             context.registerReceiver(receiver, filter);
-            bluetoothAdapter.startDiscovery();
-
         }
 
         return Result.success();
+
     }
+
+
 }

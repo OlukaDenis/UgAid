@@ -91,7 +91,7 @@ public class HomeActivity extends AppCompatActivity {
         if(id == R.id.action_share){
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "http://www.platuaid.zeustech.com.ng");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "http://www.ugaid.zeustech.com.ng");
             startActivity(Intent.createChooser(shareIntent, "Share with"));
             return true;
         }

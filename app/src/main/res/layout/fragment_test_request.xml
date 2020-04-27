@@ -15,7 +15,7 @@
             android:orientation="vertical"
             android:background="@color/whitish"
             android:layout_margin="8dp"
-            tools:context=".view.ui.symptom_form.SymptomFormActivity">
+            tools:context=".view.ui.test_request.TestRequestFragment">
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

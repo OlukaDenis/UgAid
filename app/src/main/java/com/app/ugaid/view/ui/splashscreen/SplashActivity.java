@@ -2,6 +2,7 @@ package com.app.ugaid.view.ui.splashscreen;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
@@ -25,6 +26,8 @@ import java.util.concurrent.TimeUnit;
 
 import static com.app.ugaid.utils.Config.DEVICE_LOCATIONS_WORKER;
 import static com.app.ugaid.utils.Config.GLOBAL_STATS_WORKER;
+import static com.app.ugaid.utils.Config.PERMISSIONS;
+import static com.app.ugaid.utils.Config.PERMISSION_ID;
 
 public class SplashActivity extends AppCompatActivity {
     private AlertDialog.Builder builder;
@@ -36,6 +39,10 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         builder = new AlertDialog.Builder(this);
         generateUniqueID();
+
+        if (!Config.hasPermissions(this, PERMISSIONS)) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ID);
+        }
 
         if (Config.isNetworkAvailable(this)) {
             //global stats periodic work request
@@ -52,6 +59,7 @@ public class SplashActivity extends AppCompatActivity {
                 startActivity(i);
                 finish();
             }, 4000);
+
 
         } else {
             builder.setMessage("No internet connection!")

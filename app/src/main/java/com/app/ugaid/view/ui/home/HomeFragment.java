@@ -1,19 +1,10 @@
 package com.app.ugaid.view.ui.home;
 
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,19 +21,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.work.Constraints;
-import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import com.app.ugaid.data.receivers.BluetoothReceiver;
 import com.app.ugaid.data.workers.BluetoothWorker;
 import com.app.ugaid.data.workers.LocationWorker;
 import com.app.ugaid.utils.Config;
+import com.app.ugaid.view.ui.test_request.TestRequestFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.app.ugaid.R;
@@ -52,14 +39,8 @@ import com.app.ugaid.data.workers.CovidWorker;
 import com.app.ugaid.model.CoronaCountry;
 import com.app.ugaid.model.CountryInfo;
 import com.app.ugaid.model.Covid;
-import com.app.ugaid.view.ui.hospitals.HospitalViewModel;
-import com.app.ugaid.view.ui.hospitals.HospitalViewModelFactory;
-import com.app.ugaid.view.ui.symptom_form.SymptomFormActivity;
 import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -74,7 +55,6 @@ import static com.app.ugaid.utils.Config.PERMISSIONS;
 import static com.app.ugaid.utils.Config.PERMISSION_ID;
 import static com.app.ugaid.utils.Config.REQUEST_ENABLE_BLUETOOTH;
 import static com.app.ugaid.utils.Config.UGANDA;
-import static com.app.ugaid.utils.Config.UPDATED;
 import static com.app.ugaid.utils.Config.formatNumber;
 
 public class HomeFragment extends Fragment {
@@ -82,7 +62,7 @@ public class HomeFragment extends Fragment {
 
     private TextView tvCases, tvDeaths, tvRecovered, ugCases, ugDeaths, ugRecovered, ugCasesToday, ugDeathsToday, moreCountries, moreFacts;
     private ImageView ugandaFlag;
-    private Button btnSymptom, btnTest, btn_donate;
+    private Button btnRequest, btnTest, btn_donate;
     private MaterialButton callEmergency;
     private TextView countryName;
     private HomeViewModel viewModel;
@@ -90,22 +70,27 @@ public class HomeFragment extends Fragment {
     private FirebaseAnalytics mFirebaseAnalytics;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothReceiver receiver;
+    private NavController navController;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
+        if (!Config.hasPermissions(getActivity(), PERMISSIONS)) {
+            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ID);
+        } else {
+            startLocationWorker();
+        }
 
         //Enable bluetooth
         checkForBluetooth();
-
-        //check for permissions
-        checkForPermissions();
 
         //Init firebase analytics
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
         mFirebaseAnalytics.setCurrentScreen(getActivity(), this.getClass().getSimpleName(),
                 this.getClass().getSimpleName());
+
+        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
 
         //view reference
         tvCases = root.findViewById(R.id.cases);
@@ -120,12 +105,12 @@ public class HomeFragment extends Fragment {
         ugDeathsToday = root.findViewById(R.id.uganda_deaths_today);
         ugandaFlag = root.findViewById(R.id.uganda_flag);
         countryName = root.findViewById(R.id.country_name_status);
-        btnSymptom = root.findViewById(R.id.btn_submit_info);
+        btnRequest = root.findViewById(R.id.btn_submit_info);
         btnTest = root.findViewById(R.id.btn_self_test);
         btn_donate = root.findViewById(R.id.btn_donate);
         callEmergency = root.findViewById(R.id.btn_call_emergency);
 
-        btnSymptom.setOnClickListener(v -> startActivity(new Intent(getActivity(), SymptomFormActivity.class)) );
+        btnRequest.setOnClickListener(v -> openTestRequestFragment() );
         moreCountries.setOnClickListener(v -> openCountryFragment());
         moreFacts.setOnClickListener(v -> openFactsFragment());
         btnTest.setOnClickListener(v -> openSelfTestFragment());
@@ -171,8 +156,15 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    private void openTestRequestFragment() {
+        navController.navigate(R.id.nav_request_form);
+
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Open request form");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
+    }
+
     private void openCountryFragment() {
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         navController.navigate(R.id.nav_countries);
 
         Bundle bundle = new Bundle();
@@ -181,7 +173,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void openSelfTestFragment() {
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         navController.navigate(R.id.nav_faq);
 
         Bundle bundle = new Bundle();
@@ -190,7 +181,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void openFactsFragment() {
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         navController.navigate(R.id.nav_facts);
 
         Bundle bundle = new Bundle();
@@ -199,7 +189,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void openDonateFragment() {
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         navController.navigate(R.id.nav_donate);
 
         Bundle bundle = new Bundle();
@@ -279,8 +268,6 @@ public class HomeFragment extends Fragment {
     private void checkForPermissions() {
         if (!Config.hasPermissions(getActivity(), PERMISSIONS)) {
             ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ID);
-        } else {
-            startLocationWorker();
         }
     }
 

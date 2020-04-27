@@ -1,4 +1,4 @@
-package com.app.ugaid.view.ui.symptom_form;
+package com.app.ugaid.view.ui.test_request;
 
 import android.app.Application;
 
@@ -9,11 +9,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.app.ugaid.data.repository.CovidRepository;
 import com.app.ugaid.model.Form;
 
-public class SymptomFormViewModel extends ViewModel {
+public class TestRequestViewModel extends ViewModel {
 
     private CovidRepository repository;
 
-    public SymptomFormViewModel(Application application) {
+    public TestRequestViewModel(Application application) {
         repository = new CovidRepository(application);
     }
 

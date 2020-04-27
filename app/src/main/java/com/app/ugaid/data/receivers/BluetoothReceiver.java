@@ -18,12 +18,16 @@ import androidx.core.app.NotificationCompat;
 import com.app.ugaid.R;
 import com.app.ugaid.view.ui.HomeActivity;
 
+import java.util.ArrayList;
+
 import static com.app.ugaid.utils.Config.BLUETOOTH_CHANNEL_ID;
 import static com.app.ugaid.utils.Config.BLUETOOTH_NOTIFICATION_ID;
 
 public class BluetoothReceiver extends BroadcastReceiver {
     private static final String TAG = "BluetoothReceiver";
     private NotificationManager notificationManager;
+    private ArrayList<String> deviceList = new ArrayList<>();
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "Bluetooth receiver onReceive called ..... ");
@@ -34,13 +38,16 @@ public class BluetoothReceiver extends BroadcastReceiver {
             String deviceName = device.getName();
             String deviceHardwareAddress = device.getAddress(); // MAC address
 
-            Log.d("DeviceHardwareAddress " , "hard"  + deviceHardwareAddress);
-            showNotification(context);
+            deviceList.add(deviceName +": "+ deviceHardwareAddress);
+
+            if (deviceList != null){
+                showNotification(context, deviceList.size());
+            }
         }
 
     }
 
-    private void showNotification(Context context) {
+    private void showNotification(Context context, int size) {
         notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -53,7 +60,7 @@ public class BluetoothReceiver extends BroadcastReceiver {
                 workerIntent,
                 PendingIntent.FLAG_ONE_SHOT);
 
-        NotificationCompat.Builder builder = getNotificationBuilder(context);
+        NotificationCompat.Builder builder = getNotificationBuilder(context, size);
         builder.setContentIntent(workerPendingIntent);
 
         notificationManager.notify(BLUETOOTH_NOTIFICATION_ID, builder.build());
@@ -76,14 +83,14 @@ public class BluetoothReceiver extends BroadcastReceiver {
         }
     }
 
-    private NotificationCompat.Builder getNotificationBuilder(Context context){
+    private NotificationCompat.Builder getNotificationBuilder(Context context, int size){
         return new NotificationCompat.Builder(context, BLUETOOTH_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("UgAID: Social Distance Alert")
-                .setContentText("It has been noticed that you are close to people." +
+                .setContentText("It has been noticed that you are close to "+ size +" people." +
                         "Please keep a 4 meter distance away from people to avoid risk of contracting COVID-19.")
                 .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText("It has been noticed that you are close to people." +
+                        .bigText("It has been noticed that you are close to "+ size +" people." +
                                 "Please keep a 4 meter distance away from people to avoid risk of contracting COVID-19."))
                 .setAutoCancel(true)
                 .setDefaults(NotificationCompat.DEFAULT_SOUND)
