@@ -31,13 +31,14 @@ public class CovidWorker extends Worker {
         database = CovidDatabase.getDatabase(context);
         countryDao = database.countryDao();
         globalDao = database.globalDao();
+        Log.d(TAG, "CovidWorker called: ");
     }
 
     @NonNull
     @Override
     public Result doWork() {
         Context context = getApplicationContext();
-        Log.i(TAG, "Fetching Data from Remote host");
+        Log.d(TAG, "Fetching Countries Data from Novelcovid API");
 
         try {
             ApiService service = ApiClient.getApiService(ApiService.class);
@@ -51,7 +52,7 @@ public class CovidWorker extends Worker {
                 //Populate new data
                 countryDao.insertCoronaByCountry(countryList);
 
-                Log.d(TAG, "Json string from the network " + countryList);
+                Log.d(TAG, "Countries Json string from the API " + countryList);
                 return Result.success();
             } else {
                 return Result.retry();

@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Ug-AID</string>
+    <string name="unique_device_id">Unique_Device_ID</string>
+    <string name="unique_id_prefs">Unique_Id_Preferences</string>
     <string name="_000">--</string>
     <string name="country_corona_status">%1$s Status</string>
     <string name="recovered">Recovered</string>
@@ -13,7 +15,7 @@
     <string name="title_activity_home">HomeActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Coronavirus Tracker</string>
+    <string name="nav_header_title">UgAID</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
@@ -95,7 +97,7 @@
     <string name="nearest_hospital">Your nearest Government hospital</string>
     <string name="state">State name</string>
     <string name="hospital_name">Hospital name</string>
-    <string name="report_symptoms">Report Symptoms</string>
+    <string name="submit_request">Submit request</string>
     <string name="your_telephone_number">Your telephone number</string>
     <string name="mobile_e_g_234">Mobile e.g. +234…</string>
     <string name="ncdc_demo">ncdc demo</string>
@@ -136,6 +138,9 @@
     <string name="locate_hospital">Locate Testing Centers</string>
     <string name="request_a_test">Request A test</string>
     <string name="self_test">Self test</string>
+    <string name="emergency_alert">Have noticed anyone with COVID19 symptoms and has not reported it anywhere, or have
+    noticed any incident that is against the President\'s directive? Don\'t hesitate, take action now. Call the emergency number
+    or send the details and location now.</string>
 
     <!--    Emergency numbers-->
     <string name="emergency_numbers">07032864444, 08035422711</string>
@@ -173,4 +178,7 @@
     <string name="msg_token_fmt">message_token</string>
     <string name="district">District</string>
     <string name="which_district_do_you_come_from">Which district do you come from?</string>
+    <string name="report_suspicion">Report Suspicion</string>
+    <string name="call_now">Call now</string>
+    <string name="send_report">Send report</string>
 </resources>

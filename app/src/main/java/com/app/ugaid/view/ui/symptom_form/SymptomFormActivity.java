@@ -1,8 +1,8 @@
 package com.app.ugaid.view.ui.symptom_form;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.annotation.SuppressLint;
@@ -13,8 +13,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
-import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -33,18 +31,17 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.app.ugaid.R;
 import com.app.ugaid.data.local.LocalDataSource;
 import com.app.ugaid.model.Form;
-import com.app.ugaid.model.Hospital;
 import com.app.ugaid.model.Symptom;
 import com.app.ugaid.model.User;
 import com.app.ugaid.utils.Config;
 import com.app.ugaid.view.ui.HomeActivity;
-import com.app.ugaid.view.ui.hospitals.HospitalActivity;
 import com.app.ugaid.view.ui.hospitals.HospitalViewModel;
 import com.app.ugaid.view.ui.hospitals.HospitalViewModelFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
+
+import static com.app.ugaid.utils.Config.PERMISSIONS;
+import static com.app.ugaid.utils.Config.PERMISSION_ID;
 
 public class SymptomFormActivity extends AppCompatActivity {
     private  String[] GENDER = new String[] {"Male", "Female", "Prefer not to say"};
@@ -197,7 +194,7 @@ public class SymptomFormActivity extends AppCompatActivity {
 
     @SuppressLint("MissingPermission")
     private void getLastLocation(){
-        if (Config.checkLocationPermissions(this)) {
+        if (Config.hasPermissions(this, PERMISSIONS)) {
             if (isLocationEnabled()) {
                 mFusedLocationClient.getLastLocation().addOnCompleteListener(
                         task -> {
@@ -216,7 +213,7 @@ public class SymptomFormActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         } else {
-            Config.requestLocationPermissions(this);
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ID);
         }
     }
 
@@ -256,7 +253,7 @@ public class SymptomFormActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        if (Config.checkLocationPermissions(this)) {
+        if (Config.hasPermissions(this, PERMISSIONS)) {
             getLastLocation();
         }
     }

@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -28,8 +29,6 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.app.ugaid.R;
 import com.app.ugaid.model.Test;
@@ -44,6 +43,8 @@ import static com.app.ugaid.utils.Config.DIRECT_CONTACT;
 import static com.app.ugaid.utils.Config.FATIGUE;
 import static com.app.ugaid.utils.Config.FEVER;
 import static com.app.ugaid.utils.Config.HEADACHE;
+import static com.app.ugaid.utils.Config.PERMISSIONS;
+import static com.app.ugaid.utils.Config.PERMISSION_ID;
 import static com.app.ugaid.utils.Config.SORE_THROAT;
 import static com.app.ugaid.utils.Config.TRAVEL;
 import static com.app.ugaid.utils.Config.TRAVEL_HISTORY;
@@ -376,7 +377,7 @@ public class SelfTestFragment extends Fragment {
 
     @SuppressLint("MissingPermission")
     private void getLastLocation(){
-        if (Config.checkLocationPermissions(getContext())) {
+        if (Config.hasPermissions(getActivity(), PERMISSIONS)) {
             if (isLocationEnabled()) {
                 mFusedLocationClient.getLastLocation().addOnCompleteListener(
                         task -> {
@@ -395,7 +396,7 @@ public class SelfTestFragment extends Fragment {
                 startActivity(intent);
             }
         } else {
-            Config.requestLocationPermissions(getActivity());
+            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ID);
         }
     }
 
@@ -435,7 +436,7 @@ public class SelfTestFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        if (Config.checkLocationPermissions(getContext())) {
+        if (Config.hasPermissions(getActivity(), PERMISSIONS)) {
             getLastLocation();
         }
 

@@ -1,8 +1,19 @@
 package com.app.ugaid.view.ui.home;
 
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,17 +21,29 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.work.Constraints;
 import androidx.work.Data;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
+import com.app.ugaid.data.receivers.BluetoothReceiver;
+import com.app.ugaid.data.workers.BluetoothWorker;
+import com.app.ugaid.data.workers.LocationWorker;
+import com.app.ugaid.utils.Config;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.app.ugaid.R;
 import com.app.ugaid.data.api.ApiClient;
@@ -34,6 +57,8 @@ import com.app.ugaid.view.ui.hospitals.HospitalViewModelFactory;
 import com.app.ugaid.view.ui.symptom_form.SymptomFormActivity;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -41,25 +66,41 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.app.ugaid.utils.Config.NIGERIA;
+import static android.app.Activity.RESULT_OK;
+import static com.app.ugaid.utils.Config.COUNTRY_STATS_WORKER;
+import static com.app.ugaid.utils.Config.DEVICE_LOCATIONS_WORKER;
+import static com.app.ugaid.utils.Config.EMERGENCY_NUMBER;
+import static com.app.ugaid.utils.Config.PERMISSIONS;
+import static com.app.ugaid.utils.Config.PERMISSION_ID;
+import static com.app.ugaid.utils.Config.REQUEST_ENABLE_BLUETOOTH;
 import static com.app.ugaid.utils.Config.UGANDA;
 import static com.app.ugaid.utils.Config.UPDATED;
 import static com.app.ugaid.utils.Config.formatNumber;
 
 public class HomeFragment extends Fragment {
-    private WorkManager covidWorkManager;
+    private WorkManager locationWorker;
 
     private TextView tvCases, tvDeaths, tvRecovered, ugCases, ugDeaths, ugRecovered, ugCasesToday, ugDeathsToday, moreCountries, moreFacts;
     private ImageView ugandaFlag;
     private Button btnSymptom, btnTest, btn_donate;
+    private MaterialButton callEmergency;
     private TextView countryName;
     private HomeViewModel viewModel;
     private static final String TAG = "HomeFragment";
     private FirebaseAnalytics mFirebaseAnalytics;
+    private BluetoothAdapter bluetoothAdapter;
+    private BluetoothReceiver receiver;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+
+
+        //Enable bluetooth
+        checkForBluetooth();
+
+        //check for permissions
+        checkForPermissions();
 
         //Init firebase analytics
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity());
@@ -82,61 +123,65 @@ public class HomeFragment extends Fragment {
         btnSymptom = root.findViewById(R.id.btn_submit_info);
         btnTest = root.findViewById(R.id.btn_self_test);
         btn_donate = root.findViewById(R.id.btn_donate);
+        callEmergency = root.findViewById(R.id.btn_call_emergency);
 
         btnSymptom.setOnClickListener(v -> startActivity(new Intent(getActivity(), SymptomFormActivity.class)) );
         moreCountries.setOnClickListener(v -> openCountryFragment());
         moreFacts.setOnClickListener(v -> openFactsFragment());
         btnTest.setOnClickListener(v -> openSelfTestFragment());
         btn_donate.setOnClickListener(v -> openDonateFragment());
+        callEmergency.setOnClickListener(v -> callEmergencyNow());
 
 
         com.app.ugaid.view.ui.home.HomeViewModelFactory factory = new HomeViewModelFactory(this.getActivity().getApplication());
         viewModel = new ViewModelProvider(this, factory).get(HomeViewModel.class);
 
-        HospitalViewModelFactory mfactory = new HospitalViewModelFactory(this.getActivity().getApplication());
-        HospitalViewModel viewModel = new ViewModelProvider(this, mfactory).get(HospitalViewModel.class);
-        viewModel.getAllHospitals().observe(this, hospitals -> {
-            Log.d(TAG, "Number of Hospitals: "+ hospitals.size());
-        });
 
-        // initializing a work manager
-        covidWorkManager = WorkManager.getInstance(getActivity());
+        if (Config.isNetworkAvailable(getActivity())){
+            getGlobalStats();
+            getCountryCoronaStats();
+        }
 
-        Data source = new Data.Builder()
-                .putString("workType", "PeriodicTime")
+        // initializing a countries work manager
+        WorkManager countriesWorker = WorkManager.getInstance(getActivity());
+        PeriodicWorkRequest countryStatsRequest = new PeriodicWorkRequest.Builder(CovidWorker.class, 15, TimeUnit.MINUTES)
                 .build();
+        countriesWorker.enqueueUniquePeriodicWork(COUNTRY_STATS_WORKER,
+                ExistingPeriodicWorkPolicy.KEEP,
+                countryStatsRequest);
 
-        //periodic work request
-        PeriodicWorkRequest periodicRequest = new PeriodicWorkRequest.Builder(CovidWorker.class, 15, TimeUnit.MINUTES)
-                .setInputData(source)
-                .build();
-        covidWorkManager.enqueue(periodicRequest);
-
-        //work info
-        covidWorkManager.getWorkInfoByIdLiveData(periodicRequest.getId()).observe(this, workInfo -> {
-            if (workInfo != null) {
-                WorkInfo.State state = workInfo.getState();
-            }
-        });
-
-        populateStats();
-        getCountryCoronaStats();
+        //Discover bluetooth devices with worker
+        WorkManager discoverWorker = WorkManager.getInstance(getActivity());
+        PeriodicWorkRequest getDevicesRequest = new PeriodicWorkRequest.Builder(
+                BluetoothWorker.class,
+                5,
+                TimeUnit.MINUTES
+        ).build();
+        discoverWorker.enqueue(getDevicesRequest);
 
         return root;
 
     }
 
+    private void callEmergencyNow() {
+        if (Config.hasPermissions(getContext(), PERMISSIONS)){
+            startActivity(new Intent(Intent.ACTION_CALL).setData(Uri.parse("tel:" + EMERGENCY_NUMBER)));
+        } else {
+            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ID);
+        }
+    }
+
     private void openCountryFragment() {
-        NavController navController = Navigation.findNavController(Objects.requireNonNull(getActivity()), R.id.nav_host_fragment);
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         navController.navigate(R.id.nav_countries);
 
         Bundle bundle = new Bundle();
-        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "View COuntry Stats");
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "View Country Stats");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
     }
 
     private void openSelfTestFragment() {
-        NavController navController = Navigation.findNavController(Objects.requireNonNull(getActivity()), R.id.nav_host_fragment);
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         navController.navigate(R.id.nav_faq);
 
         Bundle bundle = new Bundle();
@@ -145,7 +190,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void openFactsFragment() {
-        NavController navController = Navigation.findNavController(Objects.requireNonNull(getActivity()), R.id.nav_host_fragment);
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         navController.navigate(R.id.nav_facts);
 
         Bundle bundle = new Bundle();
@@ -154,39 +199,12 @@ public class HomeFragment extends Fragment {
     }
 
     private void openDonateFragment() {
-        NavController navController = Navigation.findNavController(Objects.requireNonNull(getActivity()), R.id.nav_host_fragment);
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         navController.navigate(R.id.nav_donate);
 
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Start donation");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
-    }
-
-
-    private void populateStats() {
-        Covid covid = viewModel.getGlobalStats(UPDATED);
-        tvCases.setText(formatNumber(covid.getCases()));
-        tvDeaths.setText(formatNumber(covid.getDeaths()));
-        tvRecovered.setText(formatNumber(covid.getRecovered()));
-    }
-
-    private void countryStats(CoronaCountry country){
-        CountryInfo countryInfo = country.getCountryInfo();
-        Picasso.get()
-                .load(countryInfo.getFlag())
-                .placeholder(R.drawable.ic_flag)
-                .error(R.drawable.ic_flag)
-                .into(ugandaFlag);
-        ugCases.setText(formatNumber(country.getCases()));
-        ugDeaths.setText(formatNumber(country.getDeaths()));
-        ugRecovered.setText(formatNumber(country.getRecovered()));
-
-        Resources res = getResources();
-
-        countryName.setText(String.format(res.getString(R.string.country_corona_status) , country.getCountry()));
-
-        ugCasesToday.setText(String.format(res.getString(R.string.today), country.getTodayCases()));
-        ugDeathsToday.setText(String.format(res.getString(R.string.today), country.getTodayDeaths()));
     }
 
     private void getCountryCoronaStats(){
@@ -211,5 +229,107 @@ public class HomeFragment extends Fragment {
 
     }
 
+    private void countryStats(CoronaCountry country){
+        CountryInfo countryInfo = country.getCountryInfo();
+        Picasso.get()
+                .load(countryInfo.getFlag())
+                .placeholder(R.drawable.ic_flag)
+                .error(R.drawable.ic_flag)
+                .into(ugandaFlag);
+        ugCases.setText(formatNumber(country.getCases()));
+        ugDeaths.setText(formatNumber(country.getDeaths()));
+        ugRecovered.setText(formatNumber(country.getRecovered()));
+
+        Resources res = getResources();
+
+        countryName.setText(String.format(res.getString(R.string.country_corona_status) , country.getCountry()));
+
+        ugCasesToday.setText(String.format(res.getString(R.string.today), country.getTodayCases()));
+        ugDeathsToday.setText(String.format(res.getString(R.string.today), country.getTodayDeaths()));
+    }
+
+    private void getGlobalStats(){
+        ApiService service = ApiClient.getApiService(ApiService.class);
+        Call<Covid> call = service.getWorldStats();
+        call.enqueue(new Callback<Covid>() {
+            @Override
+            public void onResponse(Call<Covid> call, Response<Covid> response) {
+                if (response.isSuccessful()){
+                    Covid covid = response.body();
+                    if (covid != null) {
+                       populateStats(covid);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Covid> call, Throwable t) {
+                Log.e(TAG, "onFailure: ",t );
+            }
+        });
+
+    }
+
+    private void populateStats(Covid covid) {
+        tvCases.setText(formatNumber(covid.getCases()));
+        tvDeaths.setText(formatNumber(covid.getDeaths()));
+        tvRecovered.setText(formatNumber(covid.getRecovered()));
+    }
+
+    private void checkForPermissions() {
+        if (!Config.hasPermissions(getActivity(), PERMISSIONS)) {
+            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ID);
+        } else {
+            startLocationWorker();
+        }
+    }
+
+    private void startLocationWorker() {
+        //Sending device locations worker
+        WorkManager locationsWorkManager = WorkManager.getInstance(getActivity());
+        PeriodicWorkRequest locationRequest = new PeriodicWorkRequest.Builder(LocationWorker.class,
+                60,
+                TimeUnit.MINUTES)
+                .build();
+        locationsWorkManager.enqueueUniquePeriodicWork(DEVICE_LOCATIONS_WORKER,
+                ExistingPeriodicWorkPolicy.KEEP,
+                locationRequest);
+    }
+
+    private void checkForBluetooth(){
+        Log.d(TAG, "checkForBluetooth called..... ");
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            // Device doesn't support Bluetooth
+            Toast.makeText(getActivity(), "Your device doesn't support bluetooth.", Toast.LENGTH_SHORT).show();
+        } else {
+
+            if (!bluetoothAdapter.isEnabled()) {
+                Log.d(TAG, "Enabling the bluetooth.......");
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_ENABLE_BLUETOOTH && resultCode == RESULT_OK) {
+            Toast.makeText(getActivity(), "Bluetooth enabled", Toast.LENGTH_SHORT).show();
+            makeBluetoothDiscoverable();
+
+        }
+    }
+
+    private void makeBluetoothDiscoverable() {
+        Log.d(TAG, "makeBluetoothDiscoverable called ..... ");
+        Intent discoverableIntent =
+                new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
+        startActivity(discoverableIntent);
+        Toast.makeText(getActivity(), "Your device is now discoverable to nearby Bluetooth devices", Toast.LENGTH_SHORT).show();
+    }
 
 }

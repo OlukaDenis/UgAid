@@ -10,6 +10,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -19,7 +20,9 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class Config {
@@ -39,6 +42,11 @@ public class Config {
 
     public static final int HOSPITAL_RESULT_OK = 201;
 
+    //worker tags
+    public static final String COUNTRY_STATS_WORKER = "Country_stats_worker";
+    public static final String DEVICE_LOCATIONS_WORKER ="Device_location_worker";
+    public static final String GLOBAL_STATS_WORKER = "Global_stats_worker";
+
     //Covid 19 probability
     public static final int COUGH = 90;
     public static final int COLD = 60;
@@ -56,14 +64,28 @@ public class Config {
     //Default markers
     public static final LatLng MULAGO_HOSPITAL = new LatLng(0.338067, 32.576133);
 
-    public static final LatLng ENTEBBE_HOSPITAL = new LatLng(0.064015, 32.471713);
+    public static final LatLng ENTEBBE_HOSPITAL = new LatLng(0.059125, 32.471051);
 
-    private static final int LOCATION_PERMISSION_ID = 1;
+    public static final int REQUEST_ENABLE_BLUETOOTH = 22;
+    public static final int PERMISSION_ID = 2;
+
+    public static final String EMERGENCY_NUMBER = "0800100066";
+
+    public static final int BLUETOOTH_NOTIFICATION_ID = 121;
+    public static final String BLUETOOTH_CHANNEL_ID = "com.app.ugaid.channelId";
 
     //FCM
     public static final String FCM_NOTIFICATION_ID = "222";
     public static final int NOTIFICATION_ID = 101;
     public static final String FCM_NOTIFICATION_CHANNEL = "cloud_messages_channel";
+
+    public static final String[] PERMISSIONS = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.CALL_PHONE,
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN
+    };
 
 
     //Util methods
@@ -87,24 +109,17 @@ public class Config {
         return key.replaceAll("[-+.^:,]","");
     }
 
-    //Check whether the user allowed the location
-    public static  boolean checkLocationPermissions(Context context){
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            return true;
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
         }
-        return false;
+        return true;
     }
-
-    //If location is not allowed, request location
-    public static void requestLocationPermissions(Activity activity){
-        ActivityCompat.requestPermissions(
-                activity,
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                LOCATION_PERMISSION_ID
-        );
-    }
-
 
     //Check for available network
     public static boolean isNetworkAvailable(Context context) {

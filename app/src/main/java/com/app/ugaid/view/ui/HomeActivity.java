@@ -1,24 +1,24 @@
 package com.app.ugaid.view.ui;
 
-import android.Manifest;
-import android.content.Context;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.LocationManager;
+import android.content.IntentFilter;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.app.ugaid.data.receivers.BluetoothReceiver;
+import com.app.ugaid.data.workers.LocationWorker;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 import com.app.ugaid.R;
 import com.app.ugaid.utils.Config;
 
@@ -26,17 +26,29 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import static com.app.ugaid.utils.Config.DEVICE_LOCATIONS_WORKER;
+import static com.app.ugaid.utils.Config.PERMISSIONS;
+import static com.app.ugaid.utils.Config.PERMISSION_ID;
+import static com.app.ugaid.utils.Config.REQUEST_ENABLE_BLUETOOTH;
 
 public class HomeActivity extends AppCompatActivity {
     private static final String TAG = "HomeActivity";
     private AppBarConfiguration mAppBarConfiguration;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private BluetoothReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +56,6 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        getFCMtoken();
-
-        //Init firebase analytics
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        Config.checkLocationPermissions(this);
-        requestPermission();
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -66,6 +71,11 @@ public class HomeActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+
+        //Init firebase analytics
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
     }
 
     @Override
@@ -96,16 +106,4 @@ public class HomeActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
-    private void requestPermission(){
-        if (!Config.checkLocationPermissions(this)){
-            Config.requestLocationPermissions(this);
-        }
-    }
-
-    private void getFCMtoken(){
-        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(this, instanceIdResult -> {
-           String fcmToken = instanceIdResult.getToken();
-            Log.d(TAG, "getFCMtoken: "+fcmToken);
-        });
-    }
 }
