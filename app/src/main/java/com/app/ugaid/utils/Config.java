@@ -66,10 +66,13 @@ public class Config {
 
     public static final LatLng ENTEBBE_HOSPITAL = new LatLng(0.059125, 32.471051);
 
-    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
+    public static final int REQUEST_ENABLE_BLUETOOTH = 22;
     public static final int PERMISSION_ID = 2;
 
     public static final String EMERGENCY_NUMBER = "0800100066";
+
+    public static final int BLUETOOTH_NOTIFICATION_ID = 121;
+    public static final String BLUETOOTH_CHANNEL_ID = "com.app.ugaid.channelId";
 
     //FCM
     public static final String FCM_NOTIFICATION_ID = "222";
@@ -79,7 +82,9 @@ public class Config {
     public static final String[] PERMISSIONS = {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.CALL_PHONE
+            Manifest.permission.CALL_PHONE,
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN
     };
 
 
