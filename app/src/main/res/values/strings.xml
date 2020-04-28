@@ -138,9 +138,9 @@
     <string name="locate_hospital">Locate Testing Centers</string>
     <string name="request_a_test">Request test</string>
     <string name="self_test">Self test</string>
-    <string name="emergency_alert">Have noticed anyone with COVID19 symptoms and has not reported it anywhere, or have
-    noticed any incident that is against the President\'s directive? Don\'t hesitate, take action now. Call the emergency number
-    or send the details and location now.</string>
+    <string name="emergency_alert">Have you noticed anyone with COVID19 symptoms and has not reported it anywhere, or have
+    you noticed any incident that is violating the President\'s directive? Don\'t hesitate, take action now. Call the emergency number
+    or report violation now.</string>
 
     <!--    Emergency numbers-->
     <string name="emergency_numbers">07032864444, 08035422711</string>
@@ -178,7 +178,8 @@
     <string name="msg_token_fmt">message_token</string>
     <string name="district">District</string>
     <string name="which_district_do_you_come_from">Which district do you come from?</string>
-    <string name="report_suspicion">Report Suspicion</string>
+    <string name="report_suspicion">Report Violations</string>
     <string name="call_now">Call now</string>
-    <string name="send_report">Send report</string>
+    <string name="send_report">Report now</string>
+    <string name="violation_type">Violation Type</string>
 </resources>

@@ -46,6 +46,7 @@ public class Config {
     public static final String COUNTRY_STATS_WORKER = "Country_stats_worker";
     public static final String DEVICE_LOCATIONS_WORKER ="Device_location_worker";
     public static final String GLOBAL_STATS_WORKER = "Global_stats_worker";
+    public static final String BLUETOOTH_DISCOVERY_WORKER = "Bluetooth_discovery_worker";
 
     //Covid 19 probability
     public static final int COUGH = 90;

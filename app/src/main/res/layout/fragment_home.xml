@@ -217,6 +217,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="end"
+                        android:textStyle="bold"
                         android:text="@string/more_countries"
                         android:textColor="@color/colorAccent"
                         android:textSize="16sp" />
@@ -362,7 +363,7 @@
                     <Button
                         android:id="@+id/btn_self_test"
                         android:layout_width="0dp"
-                        android:layout_weight="5"
+                        android:layout_weight="4"
                         android:layout_height="wrap_content"
                         android:background="@drawable/button_background"
                         android:textColor="@android:color/white"
@@ -376,12 +377,11 @@
                     <Button
                         android:id="@+id/btn_submit_info"
                         android:layout_width="0dp"
-                        android:layout_weight="5"
+                        android:layout_weight="6"
                         android:layout_height="wrap_content"
                         android:paddingTop="10dp"
                         android:letterSpacing="0.01"
                         android:paddingBottom="10dp"
-                        android:layout_marginStart="8dp"
                         android:layout_marginEnd="16dp"
                         android:text="@string/request_a_test"
                         android:textColor="@android:color/white" />
@@ -588,6 +588,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="end"
+                        android:textStyle="bold"
                         android:text="@string/more"
                         android:paddingTop="8dp"
                         android:textColor="@color/colorAccent"
