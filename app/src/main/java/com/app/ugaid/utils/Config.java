@@ -68,24 +68,21 @@ public class Config {
 
     public static final int REQUEST_ENABLE_BLUETOOTH = 22;
     public static final int PERMISSION_ID = 2;
+    public static final int ALL_PERMISSIONS = 33;
+    public static final String ACTION_UPDATE_NOTIFICATION = "com.app.ugaid.ACTION_UPDATE_NOTIFICATION";
 
     public static final String EMERGENCY_NUMBER = "0800100066";
 
     public static final int BLUETOOTH_NOTIFICATION_ID = 121;
     public static final String BLUETOOTH_CHANNEL_ID = "com.app.ugaid.channelId";
 
+    //Alarm
+    public static final long INTERVAL_FIVE_MINUTES = 5 * 60 * 1000;
+
     //FCM
     public static final String FCM_NOTIFICATION_ID = "222";
     public static final int NOTIFICATION_ID = 101;
     public static final String FCM_NOTIFICATION_CHANNEL = "cloud_messages_channel";
-
-    public static final String[] PERMISSIONS = {
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.CALL_PHONE,
-            Manifest.permission.BLUETOOTH,
-            Manifest.permission.BLUETOOTH_ADMIN
-    };
 
 
     //Util methods
@@ -109,17 +106,6 @@ public class Config {
         return key.replaceAll("[-+.^:,]","");
     }
 
-
-    public static boolean hasPermissions(Context context, String... permissions) {
-        if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 
     //Check for available network
     public static boolean isNetworkAvailable(Context context) {

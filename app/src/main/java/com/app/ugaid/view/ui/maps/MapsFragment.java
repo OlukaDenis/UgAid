@@ -36,7 +36,6 @@ import com.app.ugaid.view.ui.test_request.TestRequestFragment;
 
 import static com.app.ugaid.utils.Config.MULAGO_HOSPITAL;
 import static com.app.ugaid.utils.Config.ENTEBBE_HOSPITAL;
-import static com.app.ugaid.utils.Config.PERMISSIONS;
 import static com.app.ugaid.utils.Config.PERMISSION_ID;
 
 /**
@@ -82,7 +81,7 @@ public class MapsFragment extends Fragment implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        enableMyLocation(mMap);
+        mMap.setMyLocationEnabled(true);
 
         // Hide the zoom controls as the button panel will cover it.
         mMap.getUiSettings().setZoomControlsEnabled(true);
@@ -172,17 +171,5 @@ public class MapsFragment extends Fragment implements
     @Override
     public void onMarkerDragEnd(Marker marker) {
 
-    }
-
-    /**
-     * Checks for location permissions, and requests them if they are missing.
-     * Otherwise, enables the location layer.
-     */
-    private void enableMyLocation(GoogleMap map) {
-        if (Config.hasPermissions(getActivity(), PERMISSIONS)){
-            map.setMyLocationEnabled(true);
-        } else {
-            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ID);
-        }
     }
 }

@@ -36,17 +36,9 @@ import com.google.android.gms.location.LocationServices;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Response;
-
-import static com.app.ugaid.utils.Config.PERMISSIONS;
-import static com.app.ugaid.utils.Config.PERMISSION_ID;
 
 public class LocationWorker extends Worker {
     private static final String TAG = "LocationWorker";
@@ -92,25 +84,20 @@ public class LocationWorker extends Worker {
     @SuppressLint("MissingPermission")
     private void getLastLocation(Context context, String unique, String timestamp){
         Log.d(TAG, "Preparing the the exact device location...... ");
-        if (Config.hasPermissions(context, PERMISSIONS)) {
             if (isLocationEnabled(context)) {
                 mFusedLocationClient.getLastLocation().addOnCompleteListener(
                         task -> {
                             Location location = task.getResult();
-                            if (location != null){
+                            if (location != null) {
                                 DatabaseReference locationRef = database.getReference().child("device-locations");
                                 DeviceLocation deviceLocation = new DeviceLocation(location.getLatitude(), location.getLongitude());
                                 locationRef.child(unique).child(timestamp).setValue(deviceLocation);
-                                Log.d(TAG, "LastLocation saved: "+deviceLocation.info());
+                                Log.d(TAG, "LastLocation saved: " + deviceLocation.info());
                             }
                         }
                 );
-            } else {
-                Toast.makeText(context, "Turn on the device location", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                context.startActivity(intent);
             }
-        }
+
     }
 
     @SuppressLint("MissingPermission")

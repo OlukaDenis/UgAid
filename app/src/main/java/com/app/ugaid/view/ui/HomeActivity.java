@@ -35,14 +35,6 @@ import androidx.work.WorkManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
-
-import java.util.concurrent.TimeUnit;
-
-import static com.app.ugaid.utils.Config.DEVICE_LOCATIONS_WORKER;
-import static com.app.ugaid.utils.Config.PERMISSIONS;
-import static com.app.ugaid.utils.Config.PERMISSION_ID;
-import static com.app.ugaid.utils.Config.REQUEST_ENABLE_BLUETOOTH;
 
 public class HomeActivity extends AppCompatActivity {
     private static final String TAG = "HomeActivity";

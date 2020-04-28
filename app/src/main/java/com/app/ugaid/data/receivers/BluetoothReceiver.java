@@ -1,17 +1,17 @@
 package com.app.ugaid.data.receivers;
 
+import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.SystemClock;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import static com.app.ugaid.utils.Config.BLUETOOTH_CHANNEL_ID;
 import static com.app.ugaid.utils.Config.BLUETOOTH_NOTIFICATION_ID;
+import static com.app.ugaid.utils.Config.INTERVAL_FIVE_MINUTES;
 
 public class BluetoothReceiver extends BroadcastReceiver {
     private static final String TAG = "BluetoothReceiver";
@@ -31,39 +32,45 @@ public class BluetoothReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "Bluetooth receiver onReceive called ..... ");
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        notificationManager = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+
         final String action = intent.getAction();
 
         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            assert device != null;
             String deviceName = device.getName();
             String deviceHardwareAddress = device.getAddress(); // MAC address
 
             deviceList.add(deviceName +": "+ deviceHardwareAddress);
 
-            if (deviceList != null){
-                showNotification(context, deviceList.size());
+
+            //create the notification channel for the app
+            createWorkerNotificationChannel();
+
+            Intent bluetoothIntent = new Intent(context, HomeActivity.class);
+            PendingIntent bluetoothPendingIntent = PendingIntent.getActivity(context,
+                    BLUETOOTH_NOTIFICATION_ID,
+                    bluetoothIntent,
+                    PendingIntent.FLAG_NO_CREATE);
+
+            long repeatInterval = INTERVAL_FIVE_MINUTES;
+            long triggerTime = SystemClock.elapsedRealtime() + repeatInterval;
+            if(alarmManager != null) {
+                // starting the alarm
+                alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        triggerTime, repeatInterval, bluetoothPendingIntent);
+
+                if (deviceList != null) {
+                    NotificationCompat.Builder builder = getNotificationBuilder(context, deviceList.size());
+                    builder.setContentIntent(bluetoothPendingIntent);
+                    notificationManager.notify(BLUETOOTH_NOTIFICATION_ID, builder.build());
+                }
             }
         }
-
-    }
-
-    private void showNotification(Context context, int size) {
-        notificationManager = (NotificationManager)
-                context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        //create the notification channel for the app
-        createWorkerNotificationChannel();
-
-        Intent workerIntent = new Intent(context, HomeActivity.class);
-        PendingIntent workerPendingIntent = PendingIntent.getActivity(context,
-                BLUETOOTH_NOTIFICATION_ID,
-                workerIntent,
-                PendingIntent.FLAG_ONE_SHOT);
-
-        NotificationCompat.Builder builder = getNotificationBuilder(context, size);
-        builder.setContentIntent(workerPendingIntent);
-
-        notificationManager.notify(BLUETOOTH_NOTIFICATION_ID, builder.build());
     }
 
 

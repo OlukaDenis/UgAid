@@ -43,7 +43,6 @@ import static com.app.ugaid.utils.Config.DIRECT_CONTACT;
 import static com.app.ugaid.utils.Config.FATIGUE;
 import static com.app.ugaid.utils.Config.FEVER;
 import static com.app.ugaid.utils.Config.HEADACHE;
-import static com.app.ugaid.utils.Config.PERMISSIONS;
 import static com.app.ugaid.utils.Config.PERMISSION_ID;
 import static com.app.ugaid.utils.Config.SORE_THROAT;
 import static com.app.ugaid.utils.Config.TRAVEL;
@@ -377,27 +376,25 @@ public class SelfTestFragment extends Fragment {
 
     @SuppressLint("MissingPermission")
     private void getLastLocation(){
-        if (Config.hasPermissions(getActivity(), PERMISSIONS)) {
-            if (isLocationEnabled()) {
-                mFusedLocationClient.getLastLocation().addOnCompleteListener(
-                        task -> {
-                            Location location = task.getResult();
-                            if (location == null) {
-                                requestNewLocationData();
-                            } else {
-                                self_test.setLatitude(location.getLatitude());
-                                self_test.setLongitude(location.getLongitude());
-                            }
+
+        if (isLocationEnabled()) {
+            mFusedLocationClient.getLastLocation().addOnCompleteListener(
+                    task -> {
+                        Location location = task.getResult();
+                        if (location == null) {
+                            requestNewLocationData();
+                        } else {
+                            self_test.setLatitude(location.getLatitude());
+                            self_test.setLongitude(location.getLongitude());
                         }
-                );
-            } else {
-                Toast.makeText(getContext(), "Turn on the device location", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-            }
+                    }
+            );
         } else {
-            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ID);
+            Toast.makeText(getContext(), "Turn on the device location", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(intent);
         }
+
     }
 
     @SuppressLint("MissingPermission")
@@ -436,9 +433,7 @@ public class SelfTestFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        if (Config.hasPermissions(getActivity(), PERMISSIONS)) {
-            getLastLocation();
-        }
+        getLastLocation();
 
     }
 }

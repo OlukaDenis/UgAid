@@ -31,13 +31,6 @@ public class BluetoothWorker extends Worker {
     public Result doWork() {
         Context context = getApplicationContext();
 
-        if (bluetoothAdapter.isEnabled()) {
-
-            Log.d(TAG, "Bluetooth enabled, starting discovery...... ");
-            // Register for broadcasts when a device is discovered.
-            IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            context.registerReceiver(receiver, filter);
-        }
 
         return Result.success();
 
